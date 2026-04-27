@@ -2,17 +2,24 @@ import React from 'react';
 
 const LanguageToggle = ({ currentLang, onToggle }) => {
   return (
-    <div className="glass" style={{
-      position: 'absolute',
-      top: '15px',
-      right: '20px',
-      display: 'flex',
-      borderRadius: '20px',
-      padding: '4px',
-      zIndex: 20
-    }}>
+    <div 
+      className="glass" 
+      role="group"
+      aria-label="Language selection"
+      style={{
+        position: 'absolute',
+        top: '15px',
+        right: '20px',
+        display: 'flex',
+        borderRadius: '20px',
+        padding: '4px',
+        zIndex: 20
+      }}
+    >
       <button
         onClick={() => onToggle('en')}
+        aria-pressed={currentLang === 'en'}
+        aria-label="Switch to English"
         style={{
           padding: '6px 12px',
           borderRadius: '16px',
@@ -27,6 +34,8 @@ const LanguageToggle = ({ currentLang, onToggle }) => {
       </button>
       <button
         onClick={() => onToggle('hi')}
+        aria-pressed={currentLang === 'hi'}
+        aria-label="Switch to Hindi"
         style={{
           padding: '6px 12px',
           borderRadius: '16px',
@@ -43,4 +52,4 @@ const LanguageToggle = ({ currentLang, onToggle }) => {
   );
 };
 
-export default LanguageToggle;
+export default React.memo(LanguageToggle);

@@ -10,7 +10,14 @@ const ProgressTracker = ({ currentStep }) => {
   ];
 
   return (
-    <div className="progress-container glass animate-slide-up" style={{
+    <div 
+      className="progress-container glass animate-slide-up" 
+      role="progressbar" 
+      aria-valuenow={currentStep} 
+      aria-valuemin="1" 
+      aria-valuemax="5"
+      aria-label={`Step ${currentStep} of 5: ${steps[currentStep - 1]?.label}`}
+      style={{
         display: 'flex',
         justifyContent: 'space-between',
         padding: '12px 20px',
@@ -18,23 +25,27 @@ const ProgressTracker = ({ currentStep }) => {
         borderRadius: 'var(--border-radius)',
         position: 'relative',
         zIndex: 10
-    }}>
+      }}
+    >
       {steps.map((step, index) => (
-        <div key={step.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-          <div style={{
-            width: '24px',
-            height: '24px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '12px',
-            fontWeight: 'bold',
-            transition: 'all 0.3s ease',
-            backgroundColor: currentStep >= step.id ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
-            color: currentStep >= step.id ? '#000' : 'var(--text-secondary)',
-            boxShadow: currentStep === step.id ? '0 0 10px var(--accent-primary)' : 'none'
-          }}>
+        <div key={step.id} style={{ display: 'flex', alignItems: 'center', flex: 1 }} title={step.label}>
+          <div 
+            aria-hidden="true"
+            style={{
+              width: '24px',
+              height: '24px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '12px',
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease',
+              backgroundColor: currentStep >= step.id ? 'var(--accent-primary)' : 'var(--bg-tertiary)',
+              color: currentStep >= step.id ? '#000' : 'var(--text-secondary)',
+              boxShadow: currentStep === step.id ? '0 0 10px var(--accent-primary)' : 'none'
+            }}
+          >
             {currentStep > step.id ? '✓' : step.id}
           </div>
           
@@ -53,4 +64,4 @@ const ProgressTracker = ({ currentStep }) => {
   );
 };
 
-export default ProgressTracker;
+export default React.memo(ProgressTracker);

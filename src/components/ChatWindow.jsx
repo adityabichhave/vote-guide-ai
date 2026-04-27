@@ -14,15 +14,20 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
   }, [messages, isTyping]);
 
   return (
-    <div style={{
-      flex: 1,
-      overflowY: 'auto',
-      padding: '20px',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative'
-    }}>
-      <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '10px' }}>
+    <div 
+      role="log" 
+      aria-live="polite" 
+      aria-relevant="additions"
+      style={{
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative'
+      }}
+    >
+      <div style={{ textAlign: 'center', marginBottom: '30px', marginTop: '10px' }} role="banner">
          <h1 style={{ 
              margin: 0, 
              fontSize: '28px', 
@@ -39,21 +44,26 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
          </p>
       </div>
 
-      {messages.map((msg, index) => {
-        const isLastMessage = index === messages.length - 1;
-        
-        return (
-          <div key={msg.id}>
-            <MessageBubble message={msg} />
-            {isLastMessage && !isTyping && msg.options && msg.options.length > 0 && (
-              <OptionsSelector options={msg.options} onSelect={onOptionSelect} />
-            )}
-          </div>
-        );
-      })}
+      <div role="list" style={{ display: 'flex', flexDirection: 'column' }}>
+        {messages.map((msg, index) => {
+          const isLastMessage = index === messages.length - 1;
+          
+          return (
+            <div key={msg.id}>
+              <MessageBubble message={msg} />
+              {isLastMessage && !isTyping && msg.options && msg.options.length > 0 && (
+                <OptionsSelector options={msg.options} onSelect={onOptionSelect} />
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {isTyping && (
-        <div className="bot-message animate-slide-up" style={{
+        <div 
+          className="bot-message animate-slide-up" 
+          aria-label="Assistant is typing"
+          style={{
             alignSelf: 'flex-start',
             margin: '12px 0',
             padding: '14px 18px',
@@ -61,7 +71,8 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
             background: 'var(--bg-tertiary)',
             display: 'flex',
             gap: '6px'
-        }}>
+          }}
+        >
             <span style={{ animation: 'slideUp 1s infinite', animationDelay: '0s' }}>●</span>
             <span style={{ animation: 'slideUp 1s infinite', animationDelay: '0.2s' }}>●</span>
             <span style={{ animation: 'slideUp 1s infinite', animationDelay: '0.4s' }}>●</span>
@@ -72,4 +83,4 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
   );
 };
 
-export default ChatWindow;
+export default React.memo(ChatWindow);

@@ -1,77 +1,92 @@
 # VoteGuide AI 🗳️
 
-VoteGuide AI is a smart, interactive web-based assistant designed to help Indian citizens navigate the election process with ease. Built with React and Vite, the application features a modern, clean chat interface that guides users step-by-step through checking eligibility, voter registration, resolving Voter ID issues, and finding polling booths.
+VoteGuide AI is a production-ready, highly interactive web-based assistant designed to help Indian citizens navigate the election process with ease. Built with React and Vite, it serves as a lightweight, smart conversation agent that walks users through checking eligibility, voter registration, managing Voter ID issues, and finding polling booths.
+
+This project was recently refactored to prioritize high-level **Code Quality, Security, Accessibility, and Testing**.
+
+## Problem Statement
+The Indian electoral process involves complex multi-step rules spanning age limits, residency checks, and physical documentation. Navigating portals for forms (Form 6, Form 8) or finding a polling booth often confuses new voters. VoteGuide AI solves this by condensing the rules into an adaptive, conversational "decision engine" that holds the user's hand through exactly what they need based on dynamic questions.
 
 ## Features ✨
 
-- **Interactive Chat Interface**: A dynamic, conversational UI that feels natural and intuitive.
-- **Bilingual Support (English & Hindi)**: Seamlessly toggle between English and Hindi to make the guide accessible to a wider audience.
-- **Smart Progress Tracking**: A visual tracker that highlights the user's progress through the various stages of the election process (Eligibility, Details, Registration, Polling, Timeline).
-- **Context-Aware Guidance**: The assistant adapts its responses based on user inputs like age and registration status.
-- **Modern UI/UX**: Developed using vanilla CSS with premium styling, including glassmorphism, fluid animations, and a sleek dark-mode aesthetic.
-- **Lightweight Architecture**: No bulky component libraries. The app is highly optimized and loads blazing fast.
+- **Smart Decision Engine**: An extensible state machine dictating conversational flows dynamically based on real-time user input.
+- **Google Maps API Integration**: Renders real map instances using `@vis.gl/react-google-maps` to help users locate polling booths visually.
+- **Firebase Session Sync**: Background structured syncing of user conversation steps into Firebase Firestore.
+- **Bilingual Support**: Instant toggling between English and Hindi.
+- **Performance Optimized**: Achieved using `React.memo`, `useCallback`, and dynamic lazy loading (`React.lazy`) of heavy map components.
+- **Top-Tier Accessibility (A11y)**: Complete with `aria-live` polite regions, `aria-labels`, `role` assignments, and full keyboard tabbability for screen readers.
+- **Security Sanitization**: Implementation of DOMPurify to aggressively strip any unexpected HTML tags from input vectors.
 
-## Technologies Used 🛠️
+## Project Architecture 📁
 
-- **React.js**: Core frontend library for building the UI and managing state.
-- **Vite**: Next-generation frontend tooling for rapid development and optimized builds.
-- **Vanilla CSS**: Custom styling leveraging CSS variables, Flexbox, and modern layout techniques without external CSS frameworks.
-
-## Project Structure 📁
-
-```
+```text
 vote-guide-ai/
-├── public/                 # Static assets
 ├── src/
-│   ├── components/         # Reusable React components
-│   │   ├── ChatWindow.jsx
-│   │   ├── InputBar.jsx
-│   │   ├── LanguageToggle.jsx
-│   │   ├── MessageBubble.jsx
-│   │   ├── OptionsSelector.jsx
-│   │   └── ProgressTracker.jsx
+│   ├── components/         # Reusable, memoized UI Components
+│   │   ├── ChatWindow.jsx  # Primary conversation log with aria-live bounds
+│   │   ├── MapComponent.jsx# Lazy-loaded Google Maps provider
+│   │   └── ...
 │   ├── hooks/              # Custom React hooks
-│   │   └── useChatFlow.js  # Chat logic and state machine
-│   ├── utils/              # Helper functions and constants
-│   │   └── constants.js    # Chat templates and multilingual strings
-│   ├── App.jsx             # Main application container
-│   ├── index.css           # Global styles and theme tokens
-│   └── main.jsx            # Application entry point
-├── index.html
-├── package.json
-└── vite.config.js
+│   │   └── useChatFlow.js  # Manages messages, typing states, user context
+│   ├── services/           # External API integration
+│   │   └── firebase.js     # Firebase app initialization and Firestore wrappers
+│   ├── utils/              # Pure Logic 
+│   │   ├── decisionEngine.js # Evaluates user input against the FSM
+│   │   └── sanitization.js # Input sanitization and validators
+│   ├── __tests__/          # Vitest suites
+│   ├── App.jsx             # Main container
+│   ├── index.css           # Vanilla CSS Design System
+│   └── main.jsx
+├── .env                    # Environment variables
+├── vercel.json             # Vercel deployment rewrite rules
+└── vitest.config.js        # Test runner setup
 ```
 
-## Running the Project Locally 🚀
+## Setup Instructions 🚀
 
-### Prerequisites
-Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
+### 1. Prerequisites
+Ensure you have [Node.js](https://nodejs.org/) installed.
 
-### Installation
+### 2. Environment Variables
+Create a `.env.local` file in the root directory by copying the `.env` template:
+```env
+VITE_GOOGLE_MAPS_API_KEY=your_actual_key
+VITE_FIREBASE_API_KEY=your_actual_key
+VITE_FIREBASE_AUTH_DOMAIN=your_domain.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_id
+VITE_FIREBASE_STORAGE_BUCKET=your_id.appspot.com
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+VITE_FIREBASE_APP_ID=your_app_id
+```
 
-1. **Clone the repository** (if you haven't already):
-   ```bash
-   git clone https://github.com/adityabichhave/vote-guide-ai.git
-   cd vote-guide-ai
-   ```
+### 3. Installation
+```bash
+git clone https://github.com/adityabichhave/vote-guide-ai.git
+cd vote-guide-ai
+npm install
+```
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+### 4. Running Locally
+```bash
+npm run dev
+```
 
-3. **Start the development server**:
-   ```bash
-   npm run dev
-   ```
+## Testing Instructions 🧪
 
-4. **View the app**:
-   Open your browser and navigate to the local URL provided in the terminal (usually `http://localhost:5173`).
+The project uses `vitest` and `@testing-library/react` for robust unit testing of the pure logic engines (Sanitization and Decision Engine).
+To run the test suites:
+```bash
+npm run test
+```
 
-## Future Roadmap 🗺️
-- **Google Maps API Integration**: Replace the placeholder visual with a live Google Map to help users locate their exact polling booths.
-- **Firebase Backend Setup**: Add a backend to store user sessions and save chat history securely.
-- **State-Specific Guidelines**: Incorporate APIs to fetch state-specific election dates and localized guidelines dynamically.
+## Deployment
+This project is configured out-of-the-box for [Vercel](https://vercel.com).
+The `vercel.json` ensures that client-side routing works flawlessly.
+You can deploy it directly via the Vercel CLI:
+```bash
+npm i -g vercel
+vercel
+```
 
 ## License 📄
 This project is open-source and available under the [MIT License](LICENSE).

@@ -12,18 +12,24 @@ const InputBar = ({ placeholder, onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="glass" style={{
-      display: 'flex',
-      padding: '12px',
-      margin: '0 20px 20px',
-      borderRadius: '30px',
-      alignItems: 'center'
-    }}>
+    <form 
+      onSubmit={handleSubmit} 
+      className="glass" 
+      aria-label="Chat input form"
+      style={{
+        display: 'flex',
+        padding: '12px',
+        margin: '0 20px 20px',
+        borderRadius: '30px',
+        alignItems: 'center'
+      }}
+    >
       <input
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder || "Type your response..."}
+        aria-label="Message input"
         style={{
           flex: 1,
           background: 'transparent',
@@ -38,6 +44,7 @@ const InputBar = ({ placeholder, onSubmit }) => {
       <button 
         type="submit"
         disabled={!text.trim()}
+        aria-label="Send message"
         style={{
           background: text.trim() ? 'var(--accent-gradient)' : 'var(--bg-tertiary)',
           color: '#fff',
@@ -52,7 +59,7 @@ const InputBar = ({ placeholder, onSubmit }) => {
           cursor: text.trim() ? 'pointer' : 'not-allowed'
         }}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
         </svg>
@@ -61,4 +68,4 @@ const InputBar = ({ placeholder, onSubmit }) => {
   );
 };
 
-export default InputBar;
+export default React.memo(InputBar);

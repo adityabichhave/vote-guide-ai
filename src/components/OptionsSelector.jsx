@@ -4,18 +4,24 @@ const OptionsSelector = ({ options, onSelect }) => {
   if (!options || options.length === 0) return null;
 
   return (
-    <div className="animate-slide-up" style={{
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '10px',
-      marginTop: '10px',
-      marginBottom: '20px',
-      paddingLeft: '10px'
-    }}>
+    <div 
+      className="animate-slide-up" 
+      role="group" 
+      aria-label="Available options"
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '10px',
+        marginTop: '10px',
+        marginBottom: '20px',
+        paddingLeft: '10px'
+      }}
+    >
       {options.map((option, index) => (
         <button
           key={index}
           onClick={() => onSelect(option)}
+          aria-label={`Select option: ${option.label}`}
           style={{
             padding: '10px 20px',
             borderRadius: '20px',
@@ -42,4 +48,4 @@ const OptionsSelector = ({ options, onSelect }) => {
   );
 };
 
-export default OptionsSelector;
+export default React.memo(OptionsSelector);

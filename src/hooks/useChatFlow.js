@@ -1,19 +1,25 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { CHAT_FLOW, translations } from '../utils/constants';
+import { getNextState } from '../utils/decisionEngine';
+import { logUserSession } from '../services/firebase';
+import { sanitizeInput, isValidState } from '../utils/sanitization';
 
+/**
+ * Custom hook to manage the state machine and conversation logic
+ * @param {string} initialLanguage - Default language code
+ */
 export const useChatFlow = (initialLanguage = 'en') => {
   const [language, setLanguage] = useState(initialLanguage);
-  
-  // messages format: { id: string, sender: 'bot' | 'user', text: string, options: Array, inputType: string, inputPlaceholder: string, showMapMockup: boolean }
+
   const [messages, setMessages] = useState([
-    { 
-      id: Date.now().toString(), 
-      sender: 'bot', 
-      ...translations[initialLanguage][CHAT_FLOW.START] 
+    {
+      id: Date.now().toString(),
+      stateId: CHAT_FLOW.START,
+      sender: 'bot',
+      ...translations[initialLanguage][CHAT_FLOW.START]
     }
   ]);
-  
-  // Track user data
+
   const [userData, setUserData] = useState({
     ageGroup: null,
     state: null,
@@ -24,73 +30,85 @@ export const useChatFlow = (initialLanguage = 'en') => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isTyping, setIsTyping] = useState(false);
 
+  // Track a session ID for logging
+  const sessionIdRef = useRef(`session_${Date.now()}`);
+
   const addMessage = useCallback((msg) => {
     setMessages(prev => [...prev, { id: Date.now().toString() + Math.random(), ...msg }]);
   }, []);
 
-  const changeLanguage = (lang) => {
+  const changeLanguage = useCallback((lang) => {
     setLanguage(lang);
-    // Restart flow on language change for simplicity
-    setMessages([{ 
-      id: Date.now().toString(), 
-      sender: 'bot', 
-      ...translations[lang][CHAT_FLOW.START] 
+    setMessages([{
+      id: Date.now().toString(),
+      stateId: CHAT_FLOW.START,
+      sender: 'bot',
+      ...translations[initialLanguage][CHAT_FLOW.START]
     }]);
     setUserData({ ageGroup: null, state: null, isRegistered: null, voterIdStatus: null });
     setCurrentStep(1);
-  };
+  }, []);
 
-  const handleOptionSelect = (option) => {
-    // 1. Add user message
+  const handleOptionSelect = useCallback((option) => {
+    const currentMessage = messages[messages.length - 1];
+    if (!currentMessage || currentMessage.sender !== 'bot') return;
+
+    // Add user message
     addMessage({ sender: 'user', text: option.label });
-    
-    // Process internal state logic based on the action
+
+    // Process internal state logic
+    let newUserData = { ...userData };
     if (option.value) {
-        if (option.value === '18+' || option.value === '<18') {
-             setUserData(prev => ({...prev, ageGroup: option.value}));
-             setCurrentStep(2);
-        }
-    }
-    
-    // Determine next state
-    let nextStateId = option.nextState;
-    if (option.action) {
-         if (option.action === 'lost_card') nextStateId = 'lost_card_info';
-         if (option.action === 'corrections') nextStateId = 'corrections_info';
+      if (option.value === '18+' || option.value === '<18') {
+        newUserData.ageGroup = option.value;
+        setUserData(newUserData);
+        setCurrentStep(2);
+      }
     }
 
-    if (!nextStateId) return;
+    // Get next state from decision engine
+    const nextResponse = getNextState(language, currentMessage.stateId, option);
+    if (!nextResponse) return;
 
-    // 2. Simulate typing then add bot response
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      addMessage({ sender: 'bot', ...nextResponse });
+
+      // Update steps based on state
+      if (nextResponse.stateId === CHAT_FLOW.REGISTERED_CHECK) setCurrentStep(3);
+      if (nextResponse.stateId === CHAT_FLOW.POLLING_BOOTH) setCurrentStep(4);
+      if (nextResponse.stateId === CHAT_FLOW.ELECTION_TIMELINE) setCurrentStep(5);
+
+      // Log progress to Firebase
+      logUserSession(sessionIdRef.current, { ...newUserData, lastStep: nextResponse.stateId });
+    }, 800);
+  }, [messages, language, userData, addMessage]);
+
+  const handleTextInput = useCallback((text, nextStateId) => {
+    const sanitizedText = sanitizeInput(text);
+
+    if (nextStateId === CHAT_FLOW.REGISTERED_CHECK && !isValidState(sanitizedText)) {
+      addMessage({ sender: 'bot', text: language === 'en' ? "That doesn't look like a valid state name. Please try again." : "यह एक मान्य राज्य का नाम नहीं लगता है। कृपया पुनः प्रयास करें।" });
+      return;
+    }
+
+    addMessage({ sender: 'user', text: sanitizedText });
+
+    let newUserData = { ...userData, state: sanitizedText };
+    setUserData(newUserData);
+
     setIsTyping(true);
     setTimeout(() => {
       setIsTyping(false);
       const botResponse = translations[language][nextStateId];
       if (botResponse) {
-        addMessage({ sender: 'bot', ...botResponse });
-        
-        // Update steps based on state
-        if (nextStateId === CHAT_FLOW.REGISTERED_CHECK) setCurrentStep(3);
-        if (nextStateId === CHAT_FLOW.POLLING_BOOTH) setCurrentStep(4);
-        if (nextStateId === CHAT_FLOW.ELECTION_TIMELINE) setCurrentStep(5);
+        addMessage({ sender: 'bot', stateId: nextStateId, ...botResponse });
+        setCurrentStep(3);
+        logUserSession(sessionIdRef.current, { ...newUserData, lastStep: nextStateId });
       }
     }, 800);
-  };
-
-  const handleTextInput = (text, nextStateId) => {
-     addMessage({ sender: 'user', text });
-     setUserData(prev => ({...prev, state: text}));
-     
-     setIsTyping(true);
-     setTimeout(() => {
-       setIsTyping(false);
-       const botResponse = translations[language][nextStateId];
-       if (botResponse) {
-         addMessage({ sender: 'bot', ...botResponse });
-         setCurrentStep(3); // Moving to registration check
-       }
-     }, 800);
-  };
+  }, [language, userData, addMessage]);
 
   return {
     language,
