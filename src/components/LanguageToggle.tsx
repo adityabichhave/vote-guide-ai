@@ -1,6 +1,12 @@
 import React from 'react';
+import { LanguageCode } from '../types';
 
-const LanguageToggle = ({ currentLang, onToggle }) => {
+interface LanguageToggleProps {
+  currentLang: LanguageCode;
+  onToggle: (lang: LanguageCode) => void;
+}
+
+const LanguageToggle: React.FC<LanguageToggleProps> = ({ currentLang, onToggle }) => {
   return (
     <div 
       className="glass" 

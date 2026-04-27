@@ -1,9 +1,14 @@
 import React, { Suspense } from 'react';
+import { ChatMessage } from '../types';
 
 // Lazy load the MapComponent to reduce initial bundle size
 const MapComponent = React.lazy(() => import('./MapComponent'));
 
-const MessageBubble = ({ message }) => {
+interface MessageBubbleProps {
+  message: ChatMessage;
+}
+
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
   const isBot = message.sender === 'bot';
 
   return (
@@ -16,8 +21,7 @@ const MessageBubble = ({ message }) => {
         margin: '12px 0',
         width: '100%'
       }}
-      role="listitem"
-      aria-label={isBot ? "Assistant message" : "User message"}
+      aria-label={isBot ? "Assistant message" : "Your message"}
     >
       <div 
         style={{
@@ -41,7 +45,7 @@ const MessageBubble = ({ message }) => {
       {message.showMapMockup && (
         <Suspense fallback={
           <div className="glass animate-pop-in" style={{ width: '100%', maxWidth: '300px', height: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '12px', borderRadius: '12px' }}>
-            <span style={{ color: 'var(--text-secondary)' }}>Loading Map...</span>
+            <span style={{ color: 'var(--text-secondary)' }}>Loading Interactive Map...</span>
           </div>
         }>
            <MapComponent />

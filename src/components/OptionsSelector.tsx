@@ -1,6 +1,12 @@
 import React from 'react';
+import { MessageOption } from '../types';
 
-const OptionsSelector = ({ options, onSelect }) => {
+interface OptionsSelectorProps {
+  options: MessageOption[];
+  onSelect: (option: MessageOption) => void;
+}
+
+const OptionsSelector: React.FC<OptionsSelectorProps> = ({ options, onSelect }) => {
   if (!options || options.length === 0) return null;
 
   return (
@@ -33,12 +39,12 @@ const OptionsSelector = ({ options, onSelect }) => {
             cursor: 'pointer'
           }}
           onMouseOver={(e) => {
-            e.target.style.background = 'var(--accent-primary)';
-            e.target.style.color = '#000';
+            (e.target as HTMLButtonElement).style.background = 'var(--accent-primary)';
+            (e.target as HTMLButtonElement).style.color = '#000';
           }}
           onMouseOut={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--accent-primary)';
+            (e.target as HTMLButtonElement).style.background = 'transparent';
+            (e.target as HTMLButtonElement).style.color = 'var(--accent-primary)';
           }}
         >
           {option.label}

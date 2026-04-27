@@ -1,6 +1,10 @@
 import React from 'react';
 
-const ProgressTracker = ({ currentStep }) => {
+interface ProgressTrackerProps {
+  currentStep: number;
+}
+
+const ProgressTracker: React.FC<ProgressTrackerProps> = ({ currentStep }) => {
   const steps = [
     { id: 1, label: 'Eligibility' },
     { id: 2, label: 'Details' },
@@ -14,8 +18,8 @@ const ProgressTracker = ({ currentStep }) => {
       className="progress-container glass animate-slide-up" 
       role="progressbar" 
       aria-valuenow={currentStep} 
-      aria-valuemin="1" 
-      aria-valuemax="5"
+      aria-valuemin={1} 
+      aria-valuemax={5}
       aria-label={`Step ${currentStep} of 5: ${steps[currentStep - 1]?.label}`}
       style={{
         display: 'flex',

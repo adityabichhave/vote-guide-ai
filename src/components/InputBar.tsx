@@ -1,13 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-const InputBar = ({ placeholder, onSubmit }) => {
+interface InputBarProps {
+  placeholder?: string;
+  onSubmit: (text: string) => void;
+}
+
+const InputBar: React.FC<InputBarProps> = ({ placeholder, onSubmit }) => {
   const [text, setText] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e) => {
+  // Focus management: focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (text.trim()) {
+    if (text.trim() && !isSubmitting) {
+      setIsSubmitting(true);
       onSubmit(text);
       setText('');
+      
+      // Debounce to prevent spam
+      setTimeout(() => {
+        setIsSubmitting(false);
+        inputRef.current?.focus();
+      }, 500);
     }
   };
 
@@ -25,11 +44,13 @@ const InputBar = ({ placeholder, onSubmit }) => {
       }}
     >
       <input
+        ref={inputRef}
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder || "Type your response..."}
         aria-label="Message input"
+        disabled={isSubmitting}
         style={{
           flex: 1,
           background: 'transparent',
@@ -43,7 +64,7 @@ const InputBar = ({ placeholder, onSubmit }) => {
       />
       <button 
         type="submit"
-        disabled={!text.trim()}
+        disabled={!text.trim() || isSubmitting}
         aria-label="Send message"
         style={{
           background: text.trim() ? 'var(--accent-gradient)' : 'var(--bg-tertiary)',
@@ -55,8 +76,8 @@ const InputBar = ({ placeholder, onSubmit }) => {
           justifyContent: 'center',
           alignItems: 'center',
           transition: 'all 0.3s ease',
-          opacity: text.trim() ? 1 : 0.5,
-          cursor: text.trim() ? 'pointer' : 'not-allowed'
+          opacity: text.trim() && !isSubmitting ? 1 : 0.5,
+          cursor: text.trim() && !isSubmitting ? 'pointer' : 'not-allowed'
         }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

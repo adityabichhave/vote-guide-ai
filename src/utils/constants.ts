@@ -1,4 +1,6 @@
-export const CHAT_FLOW = {
+import { StateNode, StateNodeID } from '../types';
+
+export const CHAT_FLOW: Record<string, StateNodeID> = {
   START: 'start',
   AGE_CHECK: 'age_check',
   UNDERAGE: 'underage',
@@ -11,7 +13,7 @@ export const CHAT_FLOW = {
   END: 'end',
 };
 
-export const translations = {
+export const translations: Record<string, Record<string, StateNode>> = {
   en: {
     [CHAT_FLOW.START]: {
       text: "Welcome to VoteGuide AI! I'm here to help you navigate the Indian election process easily. To begin, are you a citizen of India?",
@@ -22,7 +24,6 @@ export const translations = {
     },
     'non_citizen': {
       text: "Currently, only Indian citizens can participate in the Indian election process. Thank you for using VoteGuide AI!",
-      options: []
     },
     [CHAT_FLOW.AGE_CHECK]: {
       text: "Great! How old are you?",
@@ -33,7 +34,6 @@ export const translations = {
     },
     [CHAT_FLOW.UNDERAGE]: {
       text: "In India, you must be at least 18 years old to vote. You can register once you turn 18! Keep learning about the democratic process until then.",
-      options: []
     },
     [CHAT_FLOW.STATE_CHECK]: {
       text: "Excellent. Which state or union territory are you currently residing in?",
@@ -75,7 +75,7 @@ export const translations = {
         ]
      },
     [CHAT_FLOW.POLLING_BOOTH]: {
-      text: "Next up is knowing where to vote! You can find your exact polling booth details on the Voter Helpline App or the ECI website using your EPIC number. Let me show you a mockup of how it might look on a map.",
+      text: "Next up is knowing where to vote! You can find your exact polling booth details on the Voter Helpline App or the ECI website using your EPIC number. Let me show you an interactive simulation of finding a polling booth.",
       showMapMockup: true,
       options: [
         { label: "Show Election Timeline", nextState: CHAT_FLOW.ELECTION_TIMELINE }
@@ -89,7 +89,6 @@ export const translations = {
     },
     [CHAT_FLOW.END]: {
       text: "Thank you for using VoteGuide AI! Remember, voting is a fundamental right and duty. Make your voice heard!",
-      options: []
     }
   },
   hi: {
@@ -102,7 +101,6 @@ export const translations = {
     },
     'non_citizen': {
       text: "वर्तमान में, केवल भारतीय नागरिक ही भारतीय चुनाव प्रक्रिया में भाग ले सकते हैं। VoteGuide AI का उपयोग करने के लिए धन्यवाद!",
-      options: []
     },
     [CHAT_FLOW.AGE_CHECK]: {
       text: "बहुत बढ़िया! आपकी आयु कितनी है?",
@@ -113,7 +111,6 @@ export const translations = {
     },
     [CHAT_FLOW.UNDERAGE]: {
       text: "भारत में मतदान करने के लिए आपकी आयु कम से कम 18 वर्ष होनी चाहिए। 18 वर्ष का होने पर आप पंजीकरण कर सकते हैं! तब तक लोकतांत्रिक प्रक्रिया के बारे में सीखते रहें।",
-      options: []
     },
     [CHAT_FLOW.STATE_CHECK]: {
       text: "उत्कृष्ट। आप वर्तमान में किस राज्य या केंद्र शासित प्रदेश में रह रहे हैं?",
@@ -155,7 +152,7 @@ export const translations = {
          ]
       },
     [CHAT_FLOW.POLLING_BOOTH]: {
-      text: "अगला कदम यह जानना है कि वोट कहाँ देना है! आप अपने ईपीआईसी नंबर का उपयोग करके वोटर हेल्पलाइन ऐप या ईसीआई वेबसाइट पर अपने मतदान केंद्र का सटीक विवरण पा सकते हैं। मुझे आपको एक मॉकअप दिखाने दें कि यह मानचित्र पर कैसा दिख सकता है।",
+      text: "अगला कदम यह जानना है कि वोट कहाँ देना है! आप अपने ईपीआईसी नंबर का उपयोग करके वोटर हेल्पलाइन ऐप या ईसीआई वेबसाइट पर अपने मतदान केंद्र का सटीक विवरण पा सकते हैं। मुझे आपको एक इंटरेक्टिव सिमुलेशन दिखाने दें।",
       showMapMockup: true,
       options: [
         { label: "चुनाव समयरेखा दिखाएँ", nextState: CHAT_FLOW.ELECTION_TIMELINE }
@@ -169,7 +166,6 @@ export const translations = {
     },
     [CHAT_FLOW.END]: {
       text: "VoteGuide AI का उपयोग करने के लिए धन्यवाद! याद रखें, मतदान एक मौलिक अधिकार और कर्तव्य है। अपनी आवाज़ सुनाएँ!",
-      options: []
     }
   }
 };

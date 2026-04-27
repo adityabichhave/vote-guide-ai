@@ -1,9 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
 import OptionsSelector from './OptionsSelector';
+import { ChatMessage, MessageOption } from '../types';
 
-const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
-  const messagesEndRef = useRef(null);
+interface ChatWindowProps {
+  messages: ChatMessage[];
+  isTyping: boolean;
+  onOptionSelect: (option: MessageOption) => void;
+}
+
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages, isTyping, onOptionSelect }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -17,7 +24,7 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
     <div 
       role="log" 
       aria-live="polite" 
-      aria-relevant="additions"
+      aria-relevant="additions text"
       style={{
         flex: 1,
         overflowY: 'auto',
@@ -49,7 +56,7 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
           const isLastMessage = index === messages.length - 1;
           
           return (
-            <div key={msg.id}>
+            <div key={msg.id} role="listitem">
               <MessageBubble message={msg} />
               {isLastMessage && !isTyping && msg.options && msg.options.length > 0 && (
                 <OptionsSelector options={msg.options} onSelect={onOptionSelect} />
@@ -63,6 +70,7 @@ const ChatWindow = ({ messages, isTyping, onOptionSelect }) => {
         <div 
           className="bot-message animate-slide-up" 
           aria-label="Assistant is typing"
+          role="status"
           style={{
             alignSelf: 'flex-start',
             margin: '12px 0',
